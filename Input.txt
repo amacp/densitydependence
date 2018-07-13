@@ -1,0 +1,18 @@
+Input file for density_dependence.
+(gmax): 300
+(sampFreq): 10
+(sel): 1
+(geo): 1
+(init): 1
+(n0): 100
+(nLoci): 10
+(aVec): -0.01 -0.01 -0.01 -0.01 -0.01 -0.01 -0.01 -0.01 -0.01 -0.01 
+(dVec): 0 0 0 0 0 0 0 0 0 0 
+(mu): 0?0.0001
+(r): 0.5
+(rho): 0.1
+(gamma): 10
+(delta): 0.01
+(sigmaEta): 0.2
+(sigmaMate): 0.1
+(sigmaMig): 0.02
