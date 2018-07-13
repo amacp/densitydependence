@@ -13,6 +13,8 @@
 #include <math.h>
 #include <complex>
 #include <vector>
+#include "random.h"
+#include "utils.h"
 
 using namespace std;
 //global variables
@@ -70,9 +72,9 @@ class gamete
     gamete(mPop metaPop,int parent);
     int findMate(mPop metaPop);
 };
-int randPoisson(double rate);
 double randomNormal(double mu, double sigma);
 int* shuffleList(int length);
+
 //MAIN
 int main()
 {
@@ -246,7 +248,7 @@ void mPop::reproduction()
     {
         inds[i]->findNeighbors((*this));
         inds[i]->calcWrepro((*this));
-        nGametes=randPoisson(2.0*(inds[i]->Wrepro));
+        nGametes=rnd::poisson(2.0*(inds[i]->Wrepro));
         for(int g=0;g<nGametes;g++)
         {
             gametes.push_back(new gamete((*this),i));
@@ -404,34 +406,6 @@ int gamete::findMate(mPop metaPop)
         total+=pMateVec[out];
     }
     return out;
-}
-int randPoisson(double rate)
-{
-	int n10,k,ktot=0;
-	double mod,u,L,p;
-	n10=((int)rate/10); mod=rate-10.0*n10;//If the rate is a large number break it up into small pieces to prevent underflow
-	for(int r=0;r<n10;r++)
-	{
-		k=0;
-		L=exp(-10);p=1;
-		while(p>L)
-		{
-			k+=1;
-			u=rand()/(double)RAND_MAX;
-			p*=u;
-		}
-		ktot+=k-1;
-	}
-	k=0;
-	L=exp(-mod);p=1;
-	while(p>L)
-	{
-		k+=1;
-		u=rand()/(double)RAND_MAX;
-		p*=u;
-	}
-	ktot+=k-1;
-	return ktot;
 }
 int* shuffleList(int length)
 {
