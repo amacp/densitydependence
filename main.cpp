@@ -319,8 +319,19 @@ ind::ind(gamete gam1,gamete gam2,mPop metaPop)
     genome=new int*[2];
     //x=(gam1.x+gam2.x)/2.0;y=(gam1.y+gam2.y)/2.0;
     x=gam1.x;y=gam1.y;
-    x=x+randomNormal(0.0,metaPop.sigmaMig);
-    y=y+randomNormal(0.0,metaPop.sigmaMig);
+    double deltax, deltay;
+    do{ deltax= rnd::normal(0.0,metaPop.sigmaMig);}
+    while(deltax > 0.5 || deltax < -0.5);
+    
+    do{ deltay= rnd::normal(0.0,metaPop.sigmaMig);}
+    while(deltay > 0.5 || deltay < -0.5);   
+
+    x=x+deltax;
+    if(x>1.0){x-=1.0;}
+    if(x<0.0){x+=1.0;}
+    y=y+deltay;
+    if(y<0.0){y+=1.0;}
+    if(y>1.0){y-=1.0;}
     for(int c=0;c<2;c++) genome[c]=new int[metaPop.nLoci];
     for(int l=0;l<metaPop.nLoci;l++)
     {
