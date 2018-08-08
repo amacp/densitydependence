@@ -18,6 +18,7 @@
         "__string": "cpp",
         "iostream": "cpp",
         "fstream": "cpp",
-        "locale": "cpp"
+        "locale": "cpp",
+        "new": "cpp"
     }
 }
