@@ -13,6 +13,8 @@
 #include <math.h>
 #include <complex>
 #include <vector>
+#include "random.h"
+#include "utils.h"
 
 using namespace std;
 //global variables
@@ -29,7 +31,7 @@ class mPop
 {
     public:
         int sel,geo,init,nLoci,gamma,n0;
-        double *aVec,*dVec,mu,r,rho,delta,sigmaEta,sigmaMate,sigmaMig,zMax,zMin,zBar,*pVec;
+        double *aVec,*dVec,mu,r,rho,s,sigmaEta,sigmaMate,sigmaMig,zMax,zMin,zBar,*pVec;
         vector<ind*> inds;
         vector<gamete*> gametes;
         //functions
@@ -46,7 +48,7 @@ class ind
 {
     public:
     int**genome;
-    double z,x,y,eta,Wrepro,gammai,ri,deltai;
+    double z,x,y,eta,Wrepro,gammai,ri,si;
     vector<double> neighbors;
     //vector<double> pMateVec;
     //function
@@ -55,7 +57,7 @@ class ind
     ind(gamete gam1,gamete gam2,mPop metaPop);
     void findNeighbors(mPop metaPop);
     void calcEta(mPop metaPop);
-    void calcZdelta(mPop metaPop);
+    void calcZs(mPop metaPop);
     void calcWrepro(mPop metaPop);
     //void calcpMate(mPop metaPop);
 };
@@ -70,9 +72,9 @@ class gamete
     gamete(mPop metaPop,int parent);
     int findMate(mPop metaPop);
 };
-int randPoisson(double rate);
 double randomNormal(double mu, double sigma);
 int* shuffleList(int length);
+
 //MAIN
 int main()
 {
@@ -169,9 +171,9 @@ void mPop::input(int* gmaxPtr,int*sampFreqPtr)
 	while(myString != "(gamma):" && inFile.good())	{inFile>>myString;}
 	inFile>>gamma;
 	out_Pars<<"gamma:, "<<gamma<<endl;
-	while(myString != "(delta):" && inFile.good())	{inFile>>myString;}
-	inFile>>delta;
-	out_Pars<<"delta:, "<<delta<<endl;
+	while(myString != "(s):" && inFile.good())	{inFile>>myString;}
+	inFile>>s;
+	out_Pars<<"s:, "<<s<<endl;
 	while(myString != "(sigmaEta):" && inFile.good())	{inFile>>myString;}
 	inFile>>sigmaEta;
 	out_Pars<<"sigmaEta:, "<<sigmaEta<<endl;
@@ -246,7 +248,7 @@ void mPop::reproduction()
     {
         inds[i]->findNeighbors((*this));
         inds[i]->calcWrepro((*this));
-        nGametes=randPoisson(2.0*(inds[i]->Wrepro));
+        nGametes=rnd::poisson(2.0*(inds[i]->Wrepro));
         for(int g=0;g<nGametes;g++)
         {
             gametes.push_back(new gamete((*this),i));
@@ -272,9 +274,9 @@ void mPop::survivalDI()
 {
     for(int i=0;i<inds.size();i++)
     {
-        inds[i]->calcZdelta((*this));
-        //cout<<"delti: "<<inds[i]->deltai<<endl;getchar();
-        if(rand()/((double)RAND_MAX)<inds[i]->deltai)
+        inds[i]->calcZs((*this));
+        //cout<<"delti: "<<inds[i]->si<<endl;getchar();
+        if(rand()/(1.0-(double)RAND_MAX)<inds[i]->si)
         {
             inds.erase(inds.begin()+i);
             i--;
@@ -285,8 +287,8 @@ void mPop::survivalDD()
 {
     for(int i=0;i<inds.size();i++)
     {
-        //inds[i]->calcZdelta((*this));
-        if(rand()/((double)RAND_MAX)<delta)
+        //inds[i]->calcZs((*this));
+        if(rand()/((double)RAND_MAX)<(1.0-s))
         {
             inds.erase(inds.begin()+i);
             i--;
@@ -310,15 +312,26 @@ ind::ind(mPop metaPop,double xIn, double yIn)
             genome[c][l]=rand()%2;
         }
     }
-    calcZdelta(metaPop);
+    calcZs(metaPop);
 }
 ind::ind(gamete gam1,gamete gam2,mPop metaPop)
 {
     genome=new int*[2];
     //x=(gam1.x+gam2.x)/2.0;y=(gam1.y+gam2.y)/2.0;
     x=gam1.x;y=gam1.y;
-    x=x+randomNormal(0.0,metaPop.sigmaMig);
-    y=y+randomNormal(0.0,metaPop.sigmaMig);
+    double deltax, deltay;
+    do{ deltax= rnd::normal(0.0,metaPop.sigmaMig);}
+    while(deltax > 0.5 || deltax < -0.5);
+    
+    do{ deltay= rnd::normal(0.0,metaPop.sigmaMig);}
+    while(deltay > 0.5 || deltay < -0.5);   
+
+    x=x+deltax;
+    if(x>1.0){x-=1.0;}
+    if(x<0.0){x+=1.0;}
+    y=y+deltay;
+    if(y<0.0){y+=1.0;}
+    if(y>1.0){y-=1.0;}
     for(int c=0;c<2;c++) genome[c]=new int[metaPop.nLoci];
     for(int l=0;l<metaPop.nLoci;l++)
     {
@@ -344,27 +357,27 @@ void ind::calcEta(mPop metaPop)
         eta+=exp(-1.0*pow(neighbors[i],2.0)/pow(metaPop.sigmaEta,2.0));
     }
 }
-void ind::calcZdelta(mPop metaPop)
+void ind::calcZs(mPop metaPop)
 {
     z=0;
     for(int l=0;l<metaPop.nLoci;l++)
     {
         z+=metaPop.aVec[l]*(genome[0][l]+genome[1][l])+metaPop.dVec[l]*(genome[0][l]*genome[1][l]);
     }
-    deltai=metaPop.delta*(z-metaPop.zMin)/(metaPop.zMax-metaPop.zMin);
+    si=1.0-((1.0-metaPop.s)*(z-metaPop.zMin)/(metaPop.zMax-metaPop.zMin));
 }
 void ind::calcWrepro(mPop metaPop)
 {
     calcEta(metaPop);
-    calcZdelta(metaPop);
+    calcZs(metaPop);
     if(metaPop.sel==1)//density-independent
     {
        Wrepro=1.0+metaPop.rho*(1.0-eta/metaPop.gamma);
     }
     else if(metaPop.sel==2) //density-dependent
     {
-        ri=metaPop.delta+metaPop.rho-(1.0-metaPop.rho)*deltai;
-        gammai=metaPop.gamma*(metaPop.delta+metaPop.rho-(1.0-metaPop.rho)*deltai)/(metaPop.rho*(1.0-deltai));
+        ri=(1.0-metaPop.s)+metaPop.rho-(1.0-metaPop.rho)*(1.0-si);
+        gammai=metaPop.gamma*((1.0-metaPop.s)+metaPop.rho-(1.0-metaPop.rho)*(1.0-si))/(metaPop.rho*(1.0-(1.0-si)));
         Wrepro=1.0+ri*(1.0-eta/gammai);
     }
     else
@@ -404,34 +417,6 @@ int gamete::findMate(mPop metaPop)
         total+=pMateVec[out];
     }
     return out;
-}
-int randPoisson(double rate)
-{
-	int n10,k,ktot=0;
-	double mod,u,L,p;
-	n10=((int)rate/10); mod=rate-10.0*n10;//If the rate is a large number break it up into small pieces to prevent underflow
-	for(int r=0;r<n10;r++)
-	{
-		k=0;
-		L=exp(-10);p=1;
-		while(p>L)
-		{
-			k+=1;
-			u=rand()/(double)RAND_MAX;
-			p*=u;
-		}
-		ktot+=k-1;
-	}
-	k=0;
-	L=exp(-mod);p=1;
-	while(p>L)
-	{
-		k+=1;
-		u=rand()/(double)RAND_MAX;
-		p*=u;
-	}
-	ktot+=k-1;
-	return ktot;
 }
 int* shuffleList(int length)
 {

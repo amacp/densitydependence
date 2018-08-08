@@ -12,7 +12,7 @@ Input file for density_dependence.
 (r): 0.5
 (rho): 0.1
 (gamma): 10
-(delta): 0.01
+(s): 0.99
 (sigmaEta): 0.2
 (sigmaMate): 0.1
 (sigmaMig): 0.02
