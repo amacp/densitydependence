@@ -103,7 +103,7 @@ void mark_time(const bool &set)
     if(set || init) init = false;
     else {
         std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t1 - t0);
+        std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double> >(t1 - t0);
         std::cout << "Elapsed time between calls to mark_time(): " << time_span.count() << " seconds.\n";
         t0 = t1;
     }
