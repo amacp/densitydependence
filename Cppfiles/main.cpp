@@ -102,16 +102,16 @@ class Gillespie{
 
 int main(){
     rnd::set_seed();
-    const int n1_init = 10;
-    const int n2_init = 10;
+    const int n1_init = 50;
+    const int n2_init = 50;
     parameters pars;
     pars.b1 = 0.1;
     pars.b2 = 0.6;
     pars.d1 = 0.05;
     pars.d2 = 0.05;
-    pars.k1 = 50;
-    pars.k2 = 50;
-    pars.tmax = 500;
+    pars.k1 = 100;
+    pars.k2 = 100;
+    pars.tmax = 5000;
     pars.nrep = 10000;
     assert(n1_init <= pars.k1);
     assert(n2_init <= pars.k2);
@@ -145,16 +145,18 @@ int main(){
         while(test.MCstep());
     }
 
-
     std::ofstream outputcsv1("data_type1.csv");
     outputcsv1.fill(',');
     std::ofstream outputcsv2("data_type2.csv");
     outputcsv2.fill(',');
 
-    for(int i = 0; i < pars.k1; ++i){
-        for(int j = 0; j < pars.tmax; ++j){
+    for(int j = 0; j < pars.tmax; ++j){
+        double avg = 0.0; 
+        for(int i = 0; i < pars.k1; ++i){
+            avg += i*counts_type1[j][i];
             outputcsv1 << (double)counts_type1[j][i]/(double)pars.nrep << outputcsv1.fill();
         }
+
     outputcsv1 << std::endl;
     }
 
