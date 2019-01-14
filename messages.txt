@@ -1,1 +1,1 @@
-Wed Jan  9 09:59:12 2019 : random seed set to 648077805
+Mon Jan 14 11:43:02 2019 : random seed set to 4096912205
