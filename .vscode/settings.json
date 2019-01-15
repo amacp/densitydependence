@@ -19,6 +19,13 @@
         "iostream": "cpp",
         "fstream": "cpp",
         "locale": "cpp",
-        "new": "cpp"
+        "new": "cpp",
+        "__config": "cpp",
+        "__nullptr": "cpp",
+        "cstddef": "cpp",
+        "exception": "cpp",
+        "stdexcept": "cpp",
+        "type_traits": "cpp",
+        "typeinfo": "cpp"
     }
 }

@@ -6,7 +6,7 @@
         {
             "label": "build",
             "type": "shell",
-            "command": "g++ ./Cppfiles/main.cpp ./Cppfiles/random.cpp ./Cppfiles/utils.cpp -o out.a",
+            "command": "g++ -g ./Cppfiles/main.cpp ./Cppfiles/random.cpp ./Cppfiles/utils.cpp -o out.a",
             "group": {
                 "kind": "build",
                 "isDefault": true
