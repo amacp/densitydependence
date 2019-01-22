@@ -17,5 +17,5 @@ Rcpp.package.skeleton(
     
 #Add to the DESCRIPTION file:
 #Imports: Rcpp (>= 0.12.17), BH, RcppProgress
-#LinkingTo: Rcpp, BH, RcppProgress
+#LinkingTo: Rcpp, BH, RcppProgress 
 

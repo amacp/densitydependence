@@ -3,6 +3,7 @@
 #include <vector>
 #include <fstream>
 #include <cassert>
+#include <thread>
 #include "WolframLibrary.h"
 
 EXTERN_C DLLEXPORT mint WolframLibrary_getVersion(){return WolframLibraryVersion;}
@@ -255,6 +256,7 @@ EXTERN_C DLLEXPORT int myFunction(WolframLibraryData libData, mint Argc, MArgume
     };
 
     std::vector<moments> M(pars.tmax);
+    //std::thread t[2];
     for(int i = 0; i < pars.nrep; ++i){
         GillespieMoments test(n1_init,n2_init, pars); 
         while(test.MCstep(M));

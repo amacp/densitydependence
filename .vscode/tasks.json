@@ -6,7 +6,7 @@
         {
             "label": "build",
             "type": "shell",
-            "command": "g++ -g ./Cppfiles/main.cpp ./Cppfiles/random.cpp ./Cppfiles/utils.cpp -I/Users/dehaas/Documents/boost_1_69_0 -L/Users/dehaas/Documents/boost_1_69_0/libs -o out.a",
+            "command": "g++ -g ./Cppfiles/test.cpp ./Cppfiles/random.cpp ./Cppfiles/utils.cpp -I/Users/dehaas/Documents/boost_1_69_0 -I/Users/dehaas/Documents/eigen_library -L/Users/dehaas/Documents/boost_1_69_0/libs  -o out.a",
             "group": {
                 "kind": "build",
                 "isDefault": true
